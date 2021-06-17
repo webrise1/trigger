@@ -6,6 +6,7 @@ use yii\db\ActiveRecord;
 class Log extends ActiveRecord {
     const STATUS_SUCCESS=1;
     const STATUS_ERROR=2;
+    const STATUS_DANGER=3;
     public static function tableName()
     {
         return '{{%ext_triggers_log}}';
@@ -21,8 +22,9 @@ class Log extends ActiveRecord {
     }
     public static function getStatuses(){
         return[
-            self::STATUS_SUCCESS=>'Удачно',
+            self::STATUS_SUCCESS=>'Успех',
             self::STATUS_ERROR=>'Ошибка',
+            self::STATUS_DANGER=>'Предупреждение',
         ];
     }
 }

@@ -8,6 +8,7 @@ class Bootstrap implements BootstrapInterface{
     public function bootstrap($app)
     {
 
+
         //Правила маршрутизации
         $app->getUrlManager()->addRules([
             'admin/trigger/<controller>/<action>' => 'trigger/admin/<controller>/<action>',

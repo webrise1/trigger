@@ -20,6 +20,9 @@ use Yii;
             case Log::STATUS_ERROR:
                 return ['class' => 'error-log'];
                 break;
+            case Log::STATUS_DANGER:
+                return ['class' => 'danger-log'];
+                break;
         }
         return null;
     },

@@ -1,8 +1,10 @@
 <?php
 namespace webrise1\trigger\models;
+use yii\base\ExitException;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveRecord;
 use Yii;
+use yii\base\Exception;
 
 class Trigger extends ActiveRecord {
     const STATUS_ENABLE=1;
@@ -48,23 +50,29 @@ class Trigger extends ActiveRecord {
     }
 
     public function executeTrigger($only_enable=true){
+        $infoMessage=
+            'trigger.id:'.$this->id
+            .', trigger.function_name: '.$this->function_name
+            .', controller: '.(new \ReflectionObject(Yii::$app->controller))->getName();
+        $infoMessage='('.$infoMessage.')';
         if($only_enable){
             if($this->status==self::STATUS_DISABLE){
-                self::addSystemLog(Log::STATUS_ERROR,'Вызов отключенного триггера(id:'.$this->id.') Функция: '
-                    .$this->function_name
-                    .'   ('.(new \ReflectionObject(Yii::$app->controller))->getName().')');
+                self::addSystemLog(Log::STATUS_DANGER,'Попытка вызова отключенного триггера'.$infoMessage);
                 return false;
             }
         }
         $function=$this->getTriggerFunctionByName($this->function_name);
 
-        if(!empty($function)){
-            $this->result = $function();
+        if(!empty($function['value'])){
+            try{
+                $this->result = $function['value']();
+            }catch (Exception $e){
+
+            }
+
             return true;
         }else
-            self::addSystemLog(Log::STATUS_ERROR,'Вызов триггера(id:'.$this->id.') с несуществующей функцией: '
-                .$this->function_name
-                .'   ('.(new \ReflectionObject(Yii::$app->controller))->getName().')');
+            self::addSystemLog(Log::STATUS_ERROR,'Вызов триггера с несуществующей функцией '.$infoMessage);
         return false;
     }
     public static function getByTriggerName($name){
@@ -73,10 +81,13 @@ class Trigger extends ActiveRecord {
         return $trigger;
     }
     public function getTriggerFunctionByName($triggerFunctionName){
+
         $functions=$this->TriggerFunctions();
+
         if(!empty($functions[$triggerFunctionName])){
             return $functions[$triggerFunctionName];
         }
+        return null;
     }
     public function getTitleTriggerFunctionByName($triggerFunctionName){
         $func=$this->getTriggerFunctionByName($triggerFunctionName);

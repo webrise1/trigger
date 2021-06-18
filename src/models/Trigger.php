@@ -9,12 +9,13 @@ use yii\base\Exception;
 class Trigger extends ActiveRecord {
     const STATUS_ENABLE=1;
     const STATUS_DISABLE=2;
+    const TABLE_NAME='ext_trigger_trigger';
     public $params;
     public $trigger_code;
     public $result;
     public static function tableName()
     {
-        return '{{%ext_triggers_trigger}}';
+        return self::TABLE_NAME;
     }
     public function __construct(array $config = [])
     {
